@@ -23,8 +23,8 @@ bright_green = (0,255,0)
  
 block_color = (53,115,255)
  
-car_width = 73
-car_height = 73
+car_width = 102
+car_height = 101
  
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 
@@ -53,10 +53,6 @@ oxygenImg = pygame.image.load('oxy.png')
 objectImgs.append(covidImg)
 objectImgs.append(vaccineImg)
 objectImgs.append(oxygenImg)
-
-objectImgs[0] = pygame.transform.scale(covidImg, (100, 100))
-objectImgs[1] = pygame.transform.scale(vaccineImg, (100, 100))
-objectImgs[2] = pygame.transform.scale(oxygenImg, (100, 100))
 
 
 pygame.display.set_icon(gameIcon)
@@ -117,7 +113,8 @@ def crash(count):
                 quit()
                 
         
-        button("Quit",(display_width/2)-50,(display_height/2)+150,100,50,red,bright_red,quitgame)
+        button("Play Again",(display_width/2)-50,(display_height/2)+150,100,50,green,bright_green,game_loop)
+        button("Quit",(display_width/2)-50,(display_height/2)+210,100,50,red,bright_red,quitgame)
 
         pygame.display.update()
         clock.tick(15) 
@@ -240,6 +237,11 @@ def game_loop():
     gg=255
     bb=255
     
+    objectImgs[0] = pygame.transform.scale(covidImg, (100, 100))
+    objectImgs[1] = pygame.transform.scale(vaccineImg, (100, 100))
+    objectImgs[2] = pygame.transform.scale(oxygenImg, (100, 100))
+
+    
     doVacZero = 0
     doOxyZero = 0;
     dodged = 0
@@ -336,7 +338,6 @@ def game_loop():
                 	multiplier = multiplier+0.1
                 	objectImgs[typ] = pygame.transform.scale(covidImg, (int(thing_widthC), int(thing_heightC)))
                 	
-                
                 
                 if(doVacZero == 1):
                 	vac = 0
