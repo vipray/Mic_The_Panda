@@ -26,7 +26,6 @@ block_color = (53,115,255)
 car_width = 73
 car_height = 73
  
-#gameDisplay = pygame.display.set_mode((display_width,display_height))
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 
 
@@ -76,23 +75,17 @@ def things_dodged(count,vac,oxy):
     gameDisplay.blit(text,(0,0))
  
 def things(thingx, thingy, thingw, thingh, color):
-    pygame.draw.rect(gameDisplay, color, [thingx, thingy, thingw, thingh])
+    pygame.draw.rect(gameDisplay, color, [thingx, thingy, thingw, thingh],3)
  
 def car(x,y):
     gameDisplay.blit(carImg,(x,y))
-
-'''
-def covid(x,y):
-    gameDisplay.blit(covidImg,(x,y))
-
-def vaccine(x,y):
-    gameDisplay.blit(vaccineImg,(x,y))
-'''
 
 
 def buildImg(objectImg,x,y):
     gameDisplay.blit(objectImg,(x,y))
 
+def block(thingx, thingy, thingw, thingh, color):
+    pygame.draw.rect(gameDisplay, color, [thingx, thingy, thingw, thingh])
 
 
  
@@ -124,8 +117,6 @@ def crash(count):
                 quit()
                 
         
-
-        #button("Play Again",450,450,100,50,green,bright_green,game_loop)
         button("Quit",(display_width/2)-50,(display_height/2)+150,100,50,red,bright_red,quitgame)
 
         pygame.display.update()
@@ -187,12 +178,11 @@ def game_intro():
 
     while intro:
         for event in pygame.event.get():
-            #print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
                 
-        gameDisplay.fill(white)
+        #gameDisplay.fill(white)
         largeText = pygame.font.SysFont("comicsansms",115)
         TextSurf, TextRect = text_objects("Mic, The Panda", largeText)
         TextRect.center = ((display_width/2),(display_height/2))
@@ -243,6 +233,7 @@ def game_loop():
     cheezein.append(chze)
  
     chrashed = False;
+    colouriya = (0,255,0);
     thingCount = 1
  
     rr=255
@@ -262,6 +253,7 @@ def game_loop():
  
     while not gameExit:
  
+        
         #moving background
         y1i += 5
         yi += 5
@@ -300,6 +292,7 @@ def game_loop():
         x += x_change
         
         
+        block(x-1,y-1,104,104,colouriya)
         car(x,y)
         vac = vac - vacReducer
         oxy = oxy - oxyReducer
@@ -313,18 +306,6 @@ def game_loop():
         
         if x > display_width - car_width or x < 0:
             crash(dodged)
- 
-        
-        #things(thing_startx, thing_starty, thing_width, thing_height, block_color)
-        '''
-        if(typeOfVastu==0):
-        	covid(thing_startx,thing_starty);
-        elif(typeOfVastu==1):
-        	vaccine(thing_startx,thing_starty);
-        '''
-        
-        #covid(thing_startx,thing_starty);
- 
         
         thing_starty += thing_speed
         
@@ -348,11 +329,11 @@ def game_loop():
             if thing_starty > display_height:
                 cheezein.remove(obj)
                 chrashed = False;
-                thing_speed += 0.1
+                thing_speed += 0.01
                 if(typ == 0):
-                	thing_widthC += (dodged * 1.005)
-                	thing_heightC += (dodged * 1.005)
-                	multiplier = multiplier+0.02
+                	thing_widthC += (dodged * 0.2)
+                	thing_heightC += (dodged * 0.2)
+                	multiplier = multiplier+0.1
                 	objectImgs[typ] = pygame.transform.scale(covidImg, (int(thing_widthC), int(thing_heightC)))
                 	
                 
@@ -370,7 +351,8 @@ def game_loop():
                 for i in range(newVastu):
                     if(len(cheezein)>3):
                         break
-                    typ = random.randrange(0, 3)
+                    typ = random.randrange(0, 4)
+                    typ = typ%3
                     if(typ == 0):
                     	thing_width = thing_widthC
                     	thing_height = thing_heightC
@@ -392,11 +374,13 @@ def game_loop():
                     obj['thing_starty'] = display_height+1
                     #chrashed = True
                     #Virus#
-                    pygame.mixer.music.load('cough.wav')
-                    pygame.mixer.music.play()
+                    pygame.mixer.Channel(0).play(pygame.mixer.Sound('cough.wav'), maxtime=600)
+                    #pygame.mixer.music.load('cough.wav')
+                    #pygame.mixer.music.play()
                     if typ==0:
                         doVacZero = 1
                         dodged += 1
+                        colouriya = (255,0,0);
                         print('x crossover')
                         if(vac==0):
                         	if(oxy>0):
@@ -409,18 +393,23 @@ def game_loop():
                         vac = 100
                         oxy = 100
                         oxyReducer = 0.002
+                        colouriya = (0,255,0);
                         print('Vaccine')
-                        pygame.mixer.music.load('yeah.wav')
-                        pygame.mixer.music.play()
+                        pygame.mixer.Channel(0).play(pygame.mixer.Sound('yeah.wav'), maxtime=600)
+                        #pygame.mixer.music.load('yeah.wav')
+                        #pygame.mixer.music.play()
+                        
 		            
                     #Oxygen#
                     elif typ==2:
                         oxy = 100
                         oxyReducer = 0.002
+                        colouriya = (0,255,0);
                         print('Oxygen')
-                        pygame.mixer.music.load('yeah.wav')
-                        pygame.mixer.music.play()
-            
+                        pygame.mixer.Channel(0).play(pygame.mixer.Sound('yeah.wav'), maxtime=600)
+                        #pygame.mixer.music.load('yeah.wav')
+                        #pygame.mixer.music.play()
+                        
             
         pygame.display.update()
         clock.tick(60)
