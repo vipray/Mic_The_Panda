@@ -23,8 +23,9 @@ bright_green = (0,255,0)
  
 block_color = (53,115,255)
  
-car_width = 102
+car_width = 60
 car_height = 101
+
  
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 
@@ -53,6 +54,7 @@ oxygenImg = pygame.image.load('oxy.png')
 objectImgs.append(covidImg)
 objectImgs.append(vaccineImg)
 objectImgs.append(oxygenImg)
+objectImgs.append(covidImg)
 
 
 pygame.display.set_icon(gameIcon)
@@ -64,10 +66,10 @@ def things_dodged(count,vac,oxy):
     
     if(oxy<50):
     	font = pygame.font.SysFont("comicsansms", 45)
-    	text = font.render("Fought: "+str(count)+" | Power: "+str(int(vac))+" | Oxygen: "+str(int(oxy)), True, red)
+    	text = font.render("Score: "+str(int(count))+" | Power: "+str(int(vac))+" | Oxygen: "+str(int(oxy)), True, red)
     else:
     	font = pygame.font.SysFont("comicsansms", 35)
-    	text = font.render("Fought: "+str(count)+" | Power: "+str(int(vac))+" | Oxygen: "+str(int(oxy)), True, white)
+    	text = font.render("Score: "+str(int(count))+" | Power: "+str(int(vac))+" | Oxygen: "+str(int(oxy)), True, white)
     gameDisplay.blit(text,(0,0))
  
 def things(thingx, thingy, thingw, thingh, color):
@@ -193,7 +195,18 @@ def game_intro():
         
         
     
-    
+def blastEffect(x,y,g):
+    c = 20
+    i = 20-g
+    a = (i*(c+10))
+    b = (i*c)
+    #for i in range(1):
+    buildImg(objectImgs[3],x-10-a,y-10+b)
+    buildImg(objectImgs[3],x-5,y-50+b)
+    buildImg(objectImgs[3],x+(car_width//2),y-80+b)
+    buildImg(objectImgs[3],x+car_width+20+a,y-10+b)
+    buildImg(objectImgs[3],x+car_width+10+a,y-50+b)
+            
 
     
 def game_loop():
@@ -204,6 +217,8 @@ def game_loop():
     ############
     x = (display_width * 0.45)
     y = (display_height * 0.8)
+    collide_car_x = x+20
+    collide_car_y = y
     
     
     wi,hi = background_size
@@ -219,7 +234,7 @@ def game_loop():
     thing_startx = random.randrange(0, display_width-100)
     thing_starty = -600
     thing_speed = 4
-    thing_width_default = 100
+    thing_width_default = 60
     thing_widthC = 100
     thing_height_default = 100
     thing_heightC = 100
@@ -232,6 +247,7 @@ def game_loop():
     chrashed = False;
     colouriya = (0,255,0);
     thingCount = 1
+    blaster = 0;
  
     rr=255
     gg=255
@@ -240,9 +256,11 @@ def game_loop():
     objectImgs[0] = pygame.transform.scale(covidImg, (100, 100))
     objectImgs[1] = pygame.transform.scale(vaccineImg, (100, 100))
     objectImgs[2] = pygame.transform.scale(oxygenImg, (100, 100))
-
+    objectImgs[3] = pygame.transform.scale(covidImg, (30, 30))
+    
     
     doVacZero = 0
+    coronaCount = 0
     doOxyZero = 0;
     dodged = 0
     vac = 0
@@ -292,10 +310,18 @@ def game_loop():
                     x_change = 0
  
         x += x_change
+        collide_car_x += x_change
         
-        
-        block(x-1,y-1,104,104,colouriya)
+        if(vac>0):
+            block(collide_car_x,collide_car_y,car_width,car_height,green)
+        else:
+            block(collide_car_x,collide_car_y+1000,car_width,car_height,green)
         car(x,y)
+        dodged += 0.1
+        if(blaster>0):
+            blastEffect(x,y,blaster)
+            blaster -= 1;
+        
         vac = vac - vacReducer
         oxy = oxy - oxyReducer
         if(vac<0):
@@ -306,7 +332,7 @@ def game_loop():
         things_dodged(dodged,vac,oxy)
  
         
-        if x > display_width - car_width or x < 0:
+        if collide_car_x > display_width - car_width or x < 0:
             crash(dodged)
         
         thing_starty += thing_speed
@@ -331,10 +357,10 @@ def game_loop():
             if thing_starty > display_height:
                 cheezein.remove(obj)
                 chrashed = False;
-                thing_speed += 0.01
+                thing_speed += 0.05
                 if(typ == 0):
-                	thing_widthC += (dodged * 0.2)
-                	thing_heightC += (dodged * 0.2)
+                	thing_widthC += (dodged * 0.00002)
+                	thing_heightC += (dodged * 0.00002)
                 	multiplier = multiplier+0.1
                 	objectImgs[typ] = pygame.transform.scale(covidImg, (int(thing_widthC), int(thing_heightC)))
                 	
@@ -366,11 +392,17 @@ def game_loop():
                     
                     chz = {'thing_starty': thing_starty, 'thing_startx': thing_startx, 'typ': typ}
                     cheezein.append(chz)
-     
-            if y < thing_starty+thing_height - adjF and y + car_height > thing_starty:
+                    
+            if(typ==0):
+                tx = thing_startx
+            else:
+                tx = thing_startx+20
+
+
+            if collide_car_y < thing_starty+thing_height - adjF and collide_car_y + car_height > thing_starty:
                 print('y crossover')
      
-                if(x>thing_startx and x < thing_startx + thing_width or x+car_width > thing_startx and x + car_width < thing_startx+thing_width):
+                if(collide_car_x>tx and collide_car_x < tx + thing_width or collide_car_x+car_width > tx and collide_car_x + car_width < tx+thing_width):
                     #cheezein.remove(obj)
                     obj['thing_starty'] = display_height+1
                     #chrashed = True
@@ -379,11 +411,14 @@ def game_loop():
                     #pygame.mixer.music.load('cough.wav')
                     #pygame.mixer.music.play()
                     if typ==0:
-                        doVacZero = 1
-                        dodged += 1
+                        if(vac>0):
+                            blaster = 20;
+                            dodged += (coronaCount+1)*50
+                            coronaCount +=1
                         colouriya = (255,0,0);
                         print('x crossover')
                         if(vac==0):
+                        	coronaCount = 0
                         	if(oxy>0):
                         		doOxyZero = 1
                         	else:
@@ -404,7 +439,7 @@ def game_loop():
                     #Oxygen#
                     elif typ==2:
                         oxy = 100
-                        oxyReducer = 0.002
+                        #oxyReducer = 0.002
                         colouriya = (0,255,0);
                         print('Oxygen')
                         pygame.mixer.Channel(0).play(pygame.mixer.Sound('yeah.wav'), maxtime=600)
@@ -413,7 +448,7 @@ def game_loop():
                         
             
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(100)
 
 game_intro()
 game_loop()
